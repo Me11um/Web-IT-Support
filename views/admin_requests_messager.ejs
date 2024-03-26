@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+	<script type="text/javascript">
+
+		const sleep = (milliseconds) => {
+		return new Promise(resolve => setTimeout(resolve, milliseconds))
+		}
+        window.onload = function() {
+		scrollMessages();
+	  };
+	  const scrollMessages = async () => {
+			await sleep(10);
+			var element = document.getElementById("chat-main");
+			element.scrollTop = element.scrollHeight;
+		}
+        </script>
+		
+  </head>
+  <body style="background-image: none;">
+	<div id="particles-js"></div>
+	<script src="/js/particles.js"></script>
+	<script src="/js/app.js"></script>
+	 <div class="wrapper">
+        <div class="sidebar">
+			<div class="profile">
+                <img src="<%= user.profile_picture %>" alt="profile_picture">
+                <h3><%= user.name %></h3>
+                <p>Администратор</p>
+            </div>
+			<ul>
+                <li>
+                    <a href="/admin/">
+                        <span class="icon"><i class="fas fa-home"></i></span>
+                        <span class="item">Главная</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/requests" class="active">
+                        <span class="icon"><i class="fas fa-desktop"></i></span>
+                        <span class="item">Заявки</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon"><i class="fas fa-chart-line"></i></span>
+                        <span class="item">Статистика</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon"><i class="fas fa-cog"></i></span>
+                        <span class="item">Настройки</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+	<div class="chat">
+		<div class="chat-body">
+			<div class="chat-main" id="chat-main">
+				<!--
+				<div class="message">
+					<div class="message-text">
+					<span class="message-user">Изольда Алексеевна</span>
+					<span class="message-date">19.03.2024 8:32:01</span>
+					<p class="text">Добрый день! У меня ничего не работает!!! Обращалась уже который раз, но каждый день одна и та же ошибка. 
+					Сделайте уже что-то с этим, пожалуйста!! Мне нужно зайти в почту и в интернет, но у меня не получается.</p>
+					</div>
+					<img src="/img/cat2.jpg" alt="profile_picture">
+				</div>
+				<div class="message-2">
+					<div class="message-text-2">
+					<span class="message-user-2">Иванов Иван Иванович</span>
+					<span class="message-date-2">19.03.2024 10:23:45</span>
+					<p class="text-2">пашла нахуй</p>
+					</div>
+					<img src="/img/cat3.jpg" alt="profile_picture">
+				</div>-->
+				<% messages.forEach((message) => { %>
+					<% if ( message.message_admin == 1 ) { %>
+						<div class="message-2">
+							<div class="message-text-2">
+							<span class="message-user-2"><%= message.user_name %></span>
+							<span class="message-date-2"><%= message.message_date %></span>
+							<p class="text-2"><%= message.message_text %></p>
+							</div>
+							<img src="<%= message.profile_picture %>" alt="profile_picture">
+						</div>
+					<% } else { %>
+						<div class="message">
+							<div class="message-text">
+							<span class="message-user"><%= message.user_name  %></span>
+							<span class="message-date"><%= message.message_date %></span>
+							<p class="text"><%= message.message_text %></p>
+							</div>
+							<img src="<%= message.profile_picture %>" alt="profile_picture">
+						</div>
+					<% } %>
+				<% }) %>
+			</div>
+			<div class="chat-textbox">
+				<form action="/admin/requests/<%= req_id  %>" method="POST" id="messform">
+				<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required></textarea>
+				<input type="submit" value="Отправить сообщение" onclick="scrollMessages()"> 
+				</form>
+			</div>
+		</div>
+		<div class="chat-header">
+			<p>Чат по заявке №<%= req_id  %></p>
+			<p class="chat-status">Статус заявки: </p>
+			<p class="chat-status" style="color: green;">Свободна</p>
+		</div>
+	</div>
+	<div id="getejs" data-userid="<%= user.id %>" data-reqid="<%= req_id %>" data-isadmin="<%= user.isadmin %>" data-username="<%= user.name %>" data-userpicture="<%= user.profile_picture %>" hidden><%= req_id %></div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		$(function() {
+			var socket = io.connect();
+			var $form = $("#messform")
+			var $textarea = $("#message_text")
+			var $all_messages = $("#chat-main")
+
+			$form.submit(function(){
+				event.preventDefault()
+				var userid = $("#getejs").data("userid")
+				var reqid = $("#getejs").data("reqid")
+				var isadmin = $("#getejs").data("isadmin")
+				var user_name = $("#getejs").data("username")
+				var profile_picture = $("#getejs").data("userpicture")
+				socket.emit("send mess", { message_text: $textarea.val(), user_id: userid, req_id: reqid, isadmin: isadmin, user_name: user_name, profile_picture: profile_picture })
+				$textarea.val('')
+			})
+
+			socket.on('add mess', function(data) {
+				if (data.req_id == $("#getejs").data("reqid")) {
+					scrollMessages()
+					if (data.isadmin == 1) {
+						$all_messages.append(
+							'<div class="message-2">' +
+								'<div class="message-text-2">' +
+								'<span class="message-user-2">' + data.user_name + ' </span>' +
+								'<span class="message-date-2"> ' + data.message_date + '</span>' +
+								'<p class="text-2">' + data.message_text + '</p>' +
+								'</div>' +
+								'<img src='+ data.profile_picture +' alt="profile_picture">' +
+							'</div>'
+						)
+					} else {
+						$all_messages.append(
+							'<div class="message">' +
+								'<div class="message-text">' +
+								'<span class="message-user">' + data.user_name + ' </span>' +
+								'<span class="message-date"> ' + data.message_date + '</span>' +
+								'<p class="text">' + data.message_text + '</p>' +
+								'</div>' +
+								'<img src='+ data.profile_picture +' alt="profile_picture">' +
+							'</div>'
+						)
+					}
+				}
+    		})
+		});
+	</script>
+  </body>
+</html>

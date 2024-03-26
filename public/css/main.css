@@ -1,0 +1,140 @@
+body
+{
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+}
+#particles-js
+{
+	position: fixed;
+	top: 0;
+	height: 100%;
+	background-color:#fff;
+}
+
+.login-form {
+	position:fixed;
+	top:50%;
+	left:50%;
+	transform: translate(-50%, -50%);
+	width: 400px;
+	height: 500px;
+	background-color: #fff;
+	box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.2);
+	border: 1px solid #e3e3e3;
+	border-radius: 30px; 
+}
+
+.login-text {
+	position:relative;
+	top:25%;
+	left:50%;
+	transform: translate(-50%, -50%);
+	font-size: 35px;
+	font-weight: bold;
+	text-align: center;
+	font-family: "Gill Sans", sans-serif;
+	color: #b8b8b8;
+}
+
+.error-message {
+	position: relative;
+	width: 80%;
+	top: 135px;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	color: red;
+	text-align: center;
+	font-weight: bold;
+}
+
+.inputBox {
+	position: relative;
+	width: 80%;
+	top: 120px;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	margin-top: 20px;
+}
+
+.inputBox input {
+	position: relative;
+	width: 92%;
+	background: #ffffff;
+	border: 1px solid #cfcfcf;
+	outline: none;
+	padding: 25px 10px 7.5px;
+	border-radius: 10px;
+	color: #000;
+	font-weight: 500;
+	font-size: 1em;
+	transition: 0.5s;
+	left: 50%;
+	transform: translate(-50%, 0%);
+}
+
+.inputBox i 
+{
+  position: absolute;
+  left: 0;
+  padding: 15px 10px;
+  font-style: normal;
+  color: #bfbfbf;
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.inputBox input:focus ~ i,
+.inputBox input:valid ~ i
+{
+  transform: translateY(-7.5px);
+  font-size: 0.8em;
+  color: #2b94cc;
+}
+
+.inputBox input:focus,
+.inputBox input:valid
+{
+  border-color: #2b94cc;
+}
+
+.login-button {
+	position: relative;
+	width: 80%;
+	top: 120px;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	margin-top: 35px;
+}
+
+.login-button input {
+	position: relative;
+	width: 80%;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	background-color: #2b94cc;
+	border: 1px solid #2b94cc;
+	outline: none;
+	padding: 20px 10px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 1em;
+	font-family: "Gill Sans", sans-serif;
+	transition: 0.25s;
+}
+
+.login-button input:hover {
+	background-color: #ffffff;
+	border: 1px solid #2b94cc;
+	color: #2b94cc;
+}
+
+.logo {
+	position: relative;
+	width: 300px;
+	height: auto;
+	left: 50%;
+	top: 12%;
+	transform: translate(-50%, 0%);
+}
