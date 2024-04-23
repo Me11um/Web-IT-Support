@@ -291,6 +291,23 @@ body.active .wrapper .section{
 	vertical-align: top;
 	resize: none;
 }
+
+.chat .chat-body .chat-textbox input:disabled {
+	background-color: #cacaca;
+	border: 1px solid #cacaca;
+	color: #ffffff;
+	transition: 0s;
+}
+
+.chat .chat-body .chat-textbox textarea:disabled {
+	background: #cacaca;
+}
+
+.chat .chat-body .chat-textbox #reqbutton {
+	width: 100%;
+	margin-top: 5px;
+}
+
 /*
 .chat .chat-body .chat-textbox textarea:valid {
 	border: 2px solid lime;

@@ -53,6 +53,62 @@ io.sockets.on('connection', function(socket) {
         io.sockets.emit('add mess', { req_id: data.req_id, isadmin: data.isadmin, message_text: data.message_text, user_name: data.user_name, profile_picture: data.profile_picture, message_date: formatted })
     })
 
+    socket.on('take req', function(data) {
+
+        const now = new Date()
+
+        const year = now.getFullYear()
+        const month = ("0" + (now.getMonth() + 1)).slice(-2)
+        const day = ("0" + now.getDate()).slice(-2)
+
+        const hour = ("0" + now.getHours()).slice(-2)
+        const minute = ("0" + now.getMinutes()).slice(-2)
+        const second = ("0" + now.getSeconds()).slice(-2)
+
+        // YYYY-MM-DD hh:mm:ss
+        const formatted = `${day}-${month}-${year} ${hour}:${minute}:${second}`
+        
+        var message = ""
+        var set_status = 0
+        var username = ""
+        if (parseInt(data.status) == 0) {
+            message = "Ваша заявка была принята специалистом №" + String(data.user_id) + ". Специалист в данный момент ознакамливается с вашей проблемой и работает над решением. Пожалуйста, ожидайте ответ."
+            set_status = data.user_id
+        }
+
+        if (parseInt(data.status) == -1) {
+            message = "Ваша заявка была возобновлена специалистом №" + String(data.user_id) + ". Пожалуйста, ожидайте ответ."
+            set_status = data.user_id
+        }
+
+        if (parseInt(data.status) > 0) {
+            message = "Ваша заявка была завершена специалистом №" + String(data.user_id) + "."
+            set_status = -1
+        }
+
+        db.query('UPDATE requests SET status = ? WHERE id = ?', 
+        [set_status, data.req_id], (error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+        })
+        
+        db.query('INSERT INTO messages(request_id, message_admin, message_text, message_user, message_date) VALUES (?,?,?,?,?)', 
+        [data.req_id, 1, message, 0, formatted], (error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+        })
+        io.sockets.emit('add mess', { req_id: data.req_id, isadmin: 1, message_text: message, user_name: "СИСТЕМА", profile_picture: "/img/system.jpg", message_date: formatted })
+        db.query('SELECT name FROM users WHERE id = ?', [data.user_id] ,(error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+            username = results[0].name
+            io.sockets.emit('take request', { req_id: data.req_id, status: set_status, user: username })
+        })
+    })
+
 })
 
 const db = mysql.createConnection({
@@ -145,11 +201,11 @@ app.get('/admin/requests', (req, res) => {
         }
         res2 = results
     })
-    db.query('SELECT requests.id, status, text, date, users.name as user FROM requests INNER JOIN users ON requests.user = users.id ORDER BY requests.id', (error, results) => {
+    db.query('SELECT requests.id, status, text, date, users.name as user FROM requests INNER JOIN users ON requests.user = users.id ORDER BY requests.id DESC', (error, results) => {
         if (error) {
             console.log("Error connecting to database")
         }
-        res.render('admin_requests', { requests: results, user: res1[0] })
+        res.render('admin_requests', { requests: results, user: res1[0], users: res2, current_user: logged_user })
     })
 
 }) 
@@ -165,7 +221,9 @@ app.get('/admin/requests/:id', (req, res) => {
     }
 
     var res1;
-
+    var res2;
+    var res3;
+    
     db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
         if (error) {
             console.log("Error connecting to database")
@@ -173,11 +231,25 @@ app.get('/admin/requests/:id', (req, res) => {
         res1 = results
     })
 
+    db.query('SELECT * FROM requests WHERE id = ?', [req.params.id] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res2 = results
+    })
+
+    db.query('SELECT * FROM users', (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res3 = results
+    })
+
     db.query("SELECT messages.id, request_id, message_admin, message_text, users.name as user_name, message_date, users.profile_picture FROM messages INNER JOIN users ON message_user = users.id WHERE request_id = ? ORDER BY messages.id", [req.params.id], (error, results) => {
         if (error) {
             console.log("Error connecting to database")
         }
-        res.render('admin_requests_messager', { messages: results, user: res1[0], req_id: req.params.id })
+        res.render('admin_requests_messager', { messages: results, user: res1[0], req_id: req.params.id, data: { req: res2[0] } , users: res3 })
     })
 }) 
 /*

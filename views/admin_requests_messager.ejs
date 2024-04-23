@@ -108,18 +108,61 @@
 			</div>
 			<div class="chat-textbox">
 				<form action="/admin/requests/<%= req_id  %>" method="POST" id="messform">
-				<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required></textarea>
-				<input type="submit" value="Отправить сообщение" onclick="scrollMessages()"> 
+					<% if ( data.req ) { %>
+					
+						<% if ( data.req.status > 0 ) { %>
+							<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required></textarea>
+							<input id="message_button" type="submit" value="Отправить сообщение" onclick="scrollMessages()"> 
+						<% } else { %>
+							<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required disabled></textarea>
+							<input id="message_button" type="submit" value="Отправить сообщение" onclick="scrollMessages()" disabled> 
+						<% } %>	
+
+					<% } %>
+				</form>
+				<form action="/admin/requests/<%= req_id  %>" method="POST" id="reqform">
+					<% if ( data.req ) { %>
+					
+						<% if ( data.req.status == 0 ) { %>
+						<input type="submit" value="Принять заявку" onclick="scrollMessages()" id="reqbutton"> 
+						<% } else { %>
+							<% if ( data.req.status == -1 ) { %>  
+								<input type="submit" value="Возобновить заявку" onclick="scrollMessages()" id="reqbutton"> 
+							<% } else { %>
+								<input type="submit" value="Завершить заявку" onclick="scrollMessages()" id="reqbutton"> 
+							<% } %>
+						<% } %>	
+
+					<% } %>
 				</form>
 			</div>
 		</div>
 		<div class="chat-header">
 			<p>Чат по заявке №<%= req_id  %></p>
 			<p class="chat-status">Статус заявки: </p>
-			<p class="chat-status" style="color: green;">Свободна</p>
+			<% if ( data.req ) { %>
+
+			<% if ( data.req.status == 0 ) { %>
+				<p class="chat-status" id="chat-status" style="color: green;">Свободна</p>
+			<% } else { %>
+				<% if ( data.req.status == -1 ) { %>  
+					<p class="chat-status" id="chat-status" style="color: #313131;">Завершена</p>
+				<% } else { %>
+					<p class="chat-status" id="chat-status" style="color: #c0913b;">В работе у <%= users[user.id].name %></p>
+				<% } %>
+			<% } %>
+
+			<% } %>
+
+			
 		</div>
 	</div>
 	<div id="getejs" data-userid="<%= user.id %>" data-reqid="<%= req_id %>" data-isadmin="<%= user.isadmin %>" data-username="<%= user.name %>" data-userpicture="<%= user.profile_picture %>" hidden><%= req_id %></div>
+	<div id="get-req-status" hidden>
+		<% if ( data.req ) { %>
+			<%= data.req.status %>
+		<% } %>
+	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
@@ -168,6 +211,43 @@
 					}
 				}
     		})
+
+			var $reqform = $("#reqform")
+			var $reqbutton = $("#reqbutton")
+
+			$reqform.submit(function(){
+				event.preventDefault()
+				var userid = $("#getejs").data("userid")
+				var reqid = $("#getejs").data("reqid")
+				var user_name = $("#getejs").data("username")
+				var isadmin = $("#getejs").data("isadmin")
+				var req_status = $("#get-req-status").text()
+				socket.emit("take req", { user_id: userid, req_id: reqid, user_name: user_name, isadmin: isadmin, message_text: "", status: req_status })
+				//$reqbutton.val('Завершить заявку')
+			})
+
+			socket.on('take request', function(data) {
+				if (data.req_id == $("#getejs").data("reqid")) {
+					scrollMessages()
+					if (data.status == -1) {
+						$textarea.prop("disabled", true)
+						$("#message_button").prop("disabled", true)
+						$("#chat-status").css('color', '#313131')
+						$("#chat-status").text("Завершена")
+						$("#reqbutton").val("Возобновить заявку")
+					} else {
+						if (data.status > 0) {
+							$textarea.prop("disabled", false)
+							$("#message_button").prop("disabled", false)
+							$("#chat-status").css('color', '#c0913b')
+							$("#chat-status").text("В работе у " + data.user)
+							$("#reqbutton").val("Завершить заявку")
+						}
+					}
+					$("#get-req-status").text(data.status)
+				}
+    		})
+
 		});
 	</script>
   </body>

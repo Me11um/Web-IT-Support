@@ -53,11 +53,17 @@
 	</div>
     <div class="requests-field">
         <% requests.forEach((req) => { %>
-            <div class="request" onclick="location.href='/admin/requests/<%= req.id %>'">
+                <div class="request" onclick="location.href='/admin/requests/<%= req.id %>'">
                 <p class="request-number">Заявка №<%= req.id %></p>
                 <p class="request-status">Статус:</p>
                 <% if ( req.status == 0 ) { %>
                     <p class="request-status" style="color: #3bc051;">Свободна</p>
+                <% } else { %>
+                    <% if ( req.status == -1 ) { %>  
+                        <p class="request-status" style="color: #313131;">Завершена</p>
+                    <% } else { %>
+                        <p class="request-status" style="color: #c0913b;">В работе у <%= users[current_user].name %></p>
+                    <% } %>
                 <% } %>
                 <p class="request-text"><%= req.text %></p>
                 <p class="request-date"><%= req.date %></p>
