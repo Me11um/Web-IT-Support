@@ -83,6 +83,7 @@ io.sockets.on('connection', function(socket) {
 
         if (parseInt(data.status) > 0) {
             message = "Ваша заявка была завершена специалистом №" + String(data.user_id) + "."
+            if (data.isadmin == 0) message = "Пользователь завершил заявку"
             set_status = -1
         }
 
@@ -142,20 +143,65 @@ app.post('/login', (req, res) => {
 
     const { login, password } = req.body
 
-    db.query('SELECT id FROM users WHERE login = ? and password = ?', [login, password], (error, results) => {
+    db.query('SELECT * FROM users WHERE login = ? and password = ?', [login, password], (error, results) => {
         if (error) {
             console.log("Error connecting to database")
         }
         if (results.length > 0) {
             res.cookie('logged_user', results[0].id)
-            res.redirect("/admin");
+            if (results[0].isadmin == 1) res.redirect("/admin"); else res.redirect("/user");
         } else {
             res.render('index', { error_message: "Пользователь не найден" })
-        }
+        } 
     })
 
 })
-app.get('/admin', (req, res) => {
+
+app.post('/logout', (req, res) => {
+    console.log(req.body)
+
+    const { login, password } = req.body
+
+    res.clearCookie('logged_user');
+    res.redirect("/");
+})
+
+app.get('/user', (req, res) => {
+
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+
+    var res1;
+    var res2;
+
+    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res1 = results
+    })
+    db.query('SELECT * FROM users', (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res2 = results
+    })
+    db.query('SELECT requests.id, status, text, date, users.name as user, user as user_id FROM requests INNER JOIN users ON requests.user = users.id WHERE requests.user = ? ORDER BY requests.id DESC', [logged_user] , (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res.render('user_requests', { requests: results, user: res1[0], users: res2, current_user: logged_user })
+    })
+
+}) 
+
+app.get('/user/new-request', (req, res) => {
 
     var { cookies } = req
     var logged_user = 1
@@ -170,7 +216,333 @@ app.get('/admin', (req, res) => {
         if (error) {
             console.log("Error connecting to database")
         }
-            res.render('admin', { user: results[0] })
+            res.render('user_new_request', { user: results[0] })
+    })
+
+})
+
+app.post('/user/new-request', (req, res) => {
+    
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+    
+    console.log(req.body)
+
+    const { request_text } = req.body
+
+    const now = new Date()
+
+    const year = now.getFullYear()
+    const month = ("0" + (now.getMonth() + 1)).slice(-2)
+    const day = ("0" + now.getDate()).slice(-2)
+
+    const hour = ("0" + now.getHours()).slice(-2)
+    const minute = ("0" + now.getMinutes()).slice(-2)
+    const second = ("0" + now.getSeconds()).slice(-2)
+
+    // YYYY-MM-DD hh:mm:ss
+    const formatted = `${day}-${month}-${year} ${hour}:${minute}:${second}`
+
+    var res1
+
+    db.query('INSERT INTO requests(status, text, date, user) VALUES (?,?,?,?)', [0, request_text, formatted, logged_user], (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+    })
+
+    db.query('SELECT * FROM requests WHERE date = ? and user = ?', [formatted, logged_user], (error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+        res1 = results
+        db.query('INSERT INTO messages(request_id, message_admin, message_text, message_user, message_date) VALUES (?,?,?,?,?)', [res1[0].id, 0, request_text, logged_user, formatted], 
+        (error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+            res.redirect("/user/requests/" + res1[0].id);
+        })
+    })
+
+})
+
+app.get('/user/new-request', (req, res) => {
+
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+
+    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+            res.render('user_new_request', { user: results[0] })
+    })
+
+})
+
+app.post('/admin/settings/save', (req, res) => {
+    
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+    
+    console.log(req.body)
+
+    const { name, password } = req.body
+
+    var res1
+
+    db.query('UPDATE users SET name = ?, password = ? WHERE id = ?', [name, password, logged_user], 
+     (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res.redirect("/admin/settings");
+    })
+
+})
+
+app.post('/user/settings/save', (req, res) => {
+    
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+    
+    console.log(req.body)
+
+    const { name, password } = req.body
+
+    var res1
+
+    db.query('UPDATE users SET name = ?, password = ? WHERE id = ?', [name, password, logged_user], 
+     (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res.redirect("/user/settings");
+    })
+
+})
+
+app.post('/admin/settings/save_picture', (req, res) => {
+    
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+    
+    console.log(req.body)
+
+    const { link } = req.body
+
+    pic_error = ""
+
+    if (link.match(/\.(jpeg|jpg|png)$/) == null) {
+        pic_error = "Ошибка: недопустимый формат изображения"
+    }
+
+    if (pic_error == "") {
+        db.query('UPDATE users SET profile_picture = ? WHERE id = ?', [link, logged_user], 
+        (error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+                res.redirect("/admin/settings");
+        })
+    } else {
+        db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+                res.render('admin_settings', { user: results[0], picture_error: pic_error })
+        })
+    }
+})
+
+app.post('/user/settings/save_picture', (req, res) => {
+    
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+    
+    console.log(req.body)
+
+    const { link } = req.body
+
+    pic_error = ""
+
+    if (link.match(/\.(jpeg|jpg|png)$/) == null) {
+        pic_error = "Ошибка: недопустимый формат изображения"
+    }
+
+    if (pic_error == "") {
+        db.query('UPDATE users SET profile_picture = ? WHERE id = ?', [link, logged_user], 
+        (error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+                res.redirect("/user/settings");
+        })
+    } else {
+        db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+            if (error) {
+                console.log("Error connecting to database")
+            }
+                res.render('user_settings', { user: results[0], picture_error: pic_error })
+        })
+    }
+})
+
+app.get('/user/requests/:id', (req, res) => {
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+
+    var res1;
+    var res2;
+    var res3;
+    
+    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res1 = results
+    })
+
+    db.query('SELECT * FROM requests WHERE id = ?', [req.params.id] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res2 = results
+    })
+
+    db.query('SELECT * FROM users', (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res3 = results
+    })
+
+    db.query("SELECT messages.id, request_id, message_admin, message_text, users.name as user_name, message_date, users.profile_picture FROM messages INNER JOIN users ON message_user = users.id WHERE request_id = ? ORDER BY messages.id", [req.params.id], (error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+        res.render('user_requests_messanger', { messages: results, user: res1[0], req_id: req.params.id, data: { req: res2[0] } , users: res3 })
+    })
+})
+
+app.get('/admin', (req, res) => {
+
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+
+    var new_req = 0;
+    var inwork_req = 0;
+
+    db.query('SELECT COUNT(*) as count FROM requests WHERE status = ?', [0] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+            new_req = results[0].count
+    })
+
+    db.query('SELECT COUNT(*) as count FROM requests WHERE status = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+            inwork_req = results[0].count
+    })
+
+    //console.log(new_req, inwork_req)
+
+    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+            res.render('admin', { user: results[0], new_req, inwork_req })
+    })
+
+})
+
+app.get('/admin/settings', (req, res) => {
+
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+
+    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+            res.render('admin_settings', { user: results[0], picture_error: "" })
+    })
+
+})
+
+app.get('/user/settings', (req, res) => {
+
+    var { cookies } = req
+    var logged_user = 1
+
+    if ( "logged_user" in cookies ) {
+        logged_user = cookies.logged_user
+    } else {
+        res.redirect("/");
+    }
+
+    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
+        if (error) {
+            console.log("Error connecting to database")
+        }
+            res.render('user_settings', { user: results[0], picture_error: "" })
     })
 
 })
@@ -252,47 +624,6 @@ app.get('/admin/requests/:id', (req, res) => {
         res.render('admin_requests_messager', { messages: results, user: res1[0], req_id: req.params.id, data: { req: res2[0] } , users: res3 })
     })
 }) 
-/*
-app.post('/admin/requests/:id', (req, res) => {
-
-    var { cookies } = req
-    var logged_user = 1
-
-    if ( "logged_user" in cookies ) {
-        logged_user = cookies.logged_user
-    } else {
-        res.redirect("/")
-    }
-
-    const { message_text } = req.body
-    
-    const now = new Date()
-
-    const year = now.getFullYear()
-    const month = ("0" + (now.getMonth() + 1)).slice(-2)
-    const day = ("0" + now.getDate()).slice(-2)
-
-    const hour = ("0" + now.getHours()).slice(-2)
-    const minute = ("0" + now.getMinutes()).slice(-2)
-    const second = ("0" + now.getSeconds()).slice(-2)
-
-    // YYYY-MM-DD hh:mm:ss
-    const formatted = `${day}-${month}-${year} ${hour}:${minute}:${second}`
-
-    db.query('SELECT * FROM users WHERE id = ?', [logged_user] ,(error, results) => {
-        if (error) {
-            console.log("Error connecting to database")
-        }
-        db.query('INSERT INTO messages(request_id, message_admin, message_text, message_user, message_date) VALUES (?,?,?,?,?)', [req.params.id, results[0].isadmin, message_text, logged_user, formatted], (error, results) => {
-            if (error) {
-                console.log("Error connecting to database")
-            }
-                res.redirect("/admin/requests/"+req.params.id)
-        })
-    })
-
-})
-*/
 
 server.listen(8080, () => {
     console.log('Server started: http://localhost:8080')

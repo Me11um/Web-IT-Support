@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Настройки</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+  </head>
+  <body style="background-image: none;">
+	<!--<div id="particles-js"></div>
+	<script src="/js/particles.js"></script>
+	<script src="/js/app.js"></script>-->
+	 <div class="wrapper">
+        <div class="sidebar">
+			<div class="profile">
+                <img src="<%= user.profile_picture %>" alt="profile_picture">
+                <h3><%= user.name %></h3>
+                <p>Пользователь</p>
+            </div>
+			<ul>
+                <li>
+                    <a href="/user" class="active">
+                        <span class="icon"><i class="fas fa-desktop"></i></span>
+                        <span class="item">Заявки</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user/settings">
+                        <span class="icon"><i class="fas fa-cog"></i></span>
+                        <span class="item">Настройки</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="settings-menu">
+        <div class="settings-header">
+            <p>Настройки профиля</p>
+        </div>
+        <div class="settings-body">
+            <p>Картинка профиля: </p>
+            <img src="<%= user.profile_picture %>" alt="profile_picture">
+            <form action="/user/settings/save_picture" method="POST">
+                <p style="display: inline-block; width: 25%;" >Ссылка на другую картинку:</p>
+                <input type="url" name="link" value="" style="width: 50%" placeholder="https://example.com/exampleimage.jpg" required>
+                <button type="submit" style="margin-top: 0px;"> Изменить картинку профиля </button>
+            </form>
+            <p style="color: red; width: 50%"><%= picture_error %></p>
+            <hr>
+            <form action="/user/settings/save" method="POST">
+                <p style="display: inline-block;">Имя пользователя: </p>
+                <input type="text" name="name" value="<%= user.name %>" required>
+                <hr>
+                <p style="display: inline-block;">Пароль: </p>
+                <input type="password" name="password" value="<%= user.password %>" required>
+                <hr>
+                <button type="submit"> Сохранить изменения </button>
+            </form>
+            <form action="/logout" method="POST">
+                <button type="submit" class="logout-button"> Выйти из аккаунта </button>
+            </form>
+        </div>
+    </div>
+  </body>
+</html>

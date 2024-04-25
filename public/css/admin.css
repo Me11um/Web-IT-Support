@@ -116,14 +116,101 @@ body.active .wrapper .section{
 }
 
 .welcome-text h1 {
-	font-size: 50px;
+	font-size: 5vh;
+}
+
+.description-text {
+	pointer-events: none;
+	text-align: center;
+	color: #000000;
+	position:fixed;
+	top:18%;
+	left:58%;
+	transform: translate(-50%, -50%);
+}
+
+.description-text h1 {
+	font-size: 3vh;
+}
+
+.create-new-request {
+	text-align: center;
+	position:fixed;
+	top:40%;
+	left:58%;
+	transform: translate(-50%, -50%);
+}
+
+.create-new-request input {
+	/*width: 100%;*/
+	background-color: #2b94cc;
+	border: 1px solid #2b94cc;
+	outline: none;
+	padding: 12px 100px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 2.5vh;
+	font-family: "Gill Sans", sans-serif;
+	transition: 0.25s;
+	margin-top: 10px;
+}
+
+.create-new-request input:hover {
+	background-color: #ffffff;
+	border: 1px solid #2b94cc;
+	color: #2b94cc;
+}
+
+.create-new-request textarea {
+	width: 40vw;
+	height: 15vh;
+	background: #ffffff;
+	border: 1px solid #000000;
+	padding: 10px;
+	border-radius: 10px;
+	color: #000;
+	font-weight: 500;
+	font-size: 2vh;
+	vertical-align: top;
+	resize: none;
+	margin-top: 20px;
+}
+
+.create-new-request-button {
+	text-align: center;
+	position:fixed;
+	top:16%;
+	left:58%;
+	transform: translate(-50%, -50%);
+}
+
+.create-new-request-button button {
+	/*width: 100%;*/
+	background-color: #2b94cc;
+	border: 1px solid #2b94cc;
+	outline: none;
+	padding: 12px 100px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 2.5vh;
+	font-family: "Gill Sans", sans-serif;
+	transition: 0.25s;
+	margin-top: 10px;
+}
+
+.create-new-request-button button:hover {
+	background-color: #ffffff;
+	border: 1px solid #2b94cc;
+	color: #2b94cc;
 }
 
 .main-elem {
 	pointer-events: none;
 	position: fixed;
-	width: 400px;
-	height: 225px;
+	width: 30%;
+	height: 35%;
 	border-radius: 20px;
 	background-color: #2b94cc; 
 	text-align: center;
@@ -132,14 +219,14 @@ body.active .wrapper .section{
 
 .main-elem h2 {
 	color: white;
-	font-size: 38px;
+	font-size: 5.5vh;
 	font-weight: bold;
 	margin-top: 20px;
 }
 
 .main-elem h1 {
 	color: white;
-	font-size: 120px;
+	font-size: 20vh;
 	font-weight: bold;
 	margin-top: 10px;
 }
@@ -177,7 +264,8 @@ body.active .wrapper .section{
 .requests-field .request p {
     pointer-events: none;
     font-weight: bold;
-    font-size: 24px;
+    /*font-size: 24px;*/
+	font-size: 2.5vh;
     padding-left: 1%;
     padding-top: 0.5%;
 }
@@ -194,7 +282,7 @@ body.active .wrapper .section{
 .requests-field .request .request-date, .request-user {
     text-align: right;
     position:relative;
-    top: -105px;
+    top: -82%;
     padding-right: 1%;
 }
 
@@ -418,4 +506,124 @@ body.active .wrapper .section{
 	top: -50px;
 	margin-right: 10px;
 	float: right;
+}
+
+.settings-menu {
+	position: fixed;
+	left: 16%;
+	width: 84%;
+	height: 100%;
+}
+
+.settings-menu .settings-header {
+	border-bottom: 1px solid #a3a3a3;
+	/*text-align: center;*/
+	font-size: 20px;
+	font-weight: bold;
+	height: 8%;
+	min-height: 80px;
+	box-shadow: 0px 4px 10px 5px rgba(0, 0, 0, 0.1);
+	color: #a3a3a3;
+	background-color: white;
+}
+
+.settings-menu .settings-header p {
+	font-size: 22px;
+	font-weight: bold;
+	/*color: #a3a3a3;*/
+	color: #a3a3a3;
+	padding-top: 25px;
+	padding-left: 25px;
+}
+
+.settings-menu .settings-body {
+	/*display: block;*/
+	margin: 25px;
+	margin-top: 0px;
+	overflow-y: scroll;
+	max-height: 80%;
+}
+
+.settings-menu .settings-body::-webkit-scrollbar {
+	display: none;
+  }
+
+.settings-menu .settings-body p{
+	/*display: block;*/
+	font-size: 2.5vh;
+	margin-bottom: 20px;
+	margin-top: 20px;
+	font-weight: bold;
+	width: 15%;
+}
+
+.settings-menu .settings-body input{
+	/*display: block;*/
+	margin-left: 10px;
+	font-size: 2.5vh;
+	border: 0;
+  	border-bottom: 1px solid #cacaca;
+  	outline: 0;
+	transition: 0.2s;
+}
+
+.settings-menu .settings-body input:focus{
+	/*display: block;*/
+  	border-bottom: 1px solid #2b94cc;
+}
+
+.settings-menu .settings-body hr{
+	/*display: block;*/
+	margin-top: 0px;
+}
+
+.settings-menu .settings-body img{
+	/*display: block;*/
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	margin-bottom: 0px;
+}
+
+.settings-menu .settings-body button{
+	display: block;
+	background-color: #2b94cc;
+	border: 1px solid #2b94cc;
+	outline: none;
+	padding: 12px 20px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 2.5vh;
+	font-family: "Gill Sans", sans-serif;
+	transition: 0.25s;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.settings-menu .settings-body button:hover {
+	background-color: #ffffff;
+	border: 1px solid #2b94cc;
+	color: #2b94cc;
+}
+
+.settings-menu .settings-body .logout-button{
+	display: block;
+	background-color: #cc2b2b;
+	border: 1px solid #cc2b2b;
+	outline: none;
+	padding: 12px 20px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 2.5vh;
+	font-family: "Gill Sans", sans-serif;
+	transition: 0.25s;
+	margin-top: 20px;
+}
+
+.settings-menu .settings-body .logout-button:hover {
+	background-color: #ffffff;
+	border: 1px solid #cc2b2b;
+	color: #cc2b2b;
 }

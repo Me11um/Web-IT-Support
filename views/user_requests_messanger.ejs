@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Admin</title>
+    <title>Чат по заявке №<%= req_id  %></title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
@@ -33,29 +33,17 @@
 			<div class="profile">
                 <img src="<%= user.profile_picture %>" alt="profile_picture">
                 <h3><%= user.name %></h3>
-                <p>Администратор</p>
+                <p>Пользователь</p>
             </div>
 			<ul>
                 <li>
-                    <a href="/admin/">
-                        <span class="icon"><i class="fas fa-home"></i></span>
-                        <span class="item">Главная</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/admin/requests" class="active">
+                    <a href="/user/" class="active">
                         <span class="icon"><i class="fas fa-desktop"></i></span>
                         <span class="item">Заявки</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <span class="icon"><i class="fas fa-chart-line"></i></span>
-                        <span class="item">Статистика</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/admin/settings">
+                    <a href="/user/settings">
                         <span class="icon"><i class="fas fa-cog"></i></span>
                         <span class="item">Настройки</span>
                     </a>
@@ -85,7 +73,7 @@
 					<img src="/img/cat3.jpg" alt="profile_picture">
 				</div>-->
 				<% messages.forEach((message) => { %>
-					<% if ( message.message_admin == 1 ) { %>
+					<% if ( message.message_admin == 0 ) { %>
 						<div class="message-2">
 							<div class="message-text-2">
 							<span class="message-user-2"><%= message.user_name %></span>
@@ -110,12 +98,12 @@
 				<form action="/admin/requests/<%= req_id  %>" method="POST" id="messform">
 					<% if ( data.req ) { %>
 					
-						<% if ( data.req.status > 0 ) { %>
+						<% if ( data.req.status >= 0 ) { %>
 							<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required></textarea>
 							<input id="message_button" type="submit" value="Отправить сообщение" onclick="scrollMessages()"> 
 						<% } else { %>
-							<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required disabled></textarea>
-							<input id="message_button" type="submit" value="Отправить сообщение" onclick="scrollMessages()" disabled> 
+							<textarea id="message_text" name="message_text" placeholder="Введите сообщение..." required disabled hidden></textarea>
+							<input id="message_button" type="submit" value="Отправить сообщение" onclick="scrollMessages()" disabled hidden> 
 						<% } %>	
 
 					<% } %>
@@ -124,10 +112,10 @@
 					<% if ( data.req ) { %>
 					
 						<% if ( data.req.status == 0 ) { %>
-						<input type="submit" value="Принять заявку" onclick="scrollMessages()" id="reqbutton"> 
+						<input type="submit" value="Принять заявку" onclick="scrollMessages()" id="reqbutton" disabled hidden> 
 						<% } else { %>
 							<% if ( data.req.status == -1 ) { %>  
-								<input type="submit" value="Возобновить заявку" onclick="scrollMessages()" id="reqbutton"> 
+								<input type="submit" value="Возобновить заявку" onclick="scrollMessages()" id="reqbutton" disabled hidden> 
 							<% } else { %>
 								<input type="submit" value="Завершить заявку" onclick="scrollMessages()" id="reqbutton"> 
 							<% } %>
@@ -186,7 +174,7 @@
 			socket.on('add mess', function(data) {
 				if (data.req_id == $("#getejs").data("reqid")) {
 					scrollMessages()
-					if (data.isadmin == 1) {
+					if (data.isadmin == 0) {
 						$all_messages.append(
 							'<div class="message-2">' +
 								'<div class="message-text-2">' +
@@ -232,13 +220,21 @@
 					if (data.status == -1) {
 						$textarea.prop("disabled", true)
 						$("#message_button").prop("disabled", true)
+						$textarea.prop("hidden", true)
+						$("#message_button").prop("hidden", true)
+						$("#reqbutton").prop("disabled", true)
+						$("#reqbutton").prop("hidden", true)
 						$("#chat-status").css('color', '#313131')
 						$("#chat-status").text("Завершена")
-						$("#reqbutton").val("Возобновить заявку")
+						//$("#reqbutton").val("Возобновить заявку")
 					} else {
 						if (data.status > 0) {
 							$textarea.prop("disabled", false)
 							$("#message_button").prop("disabled", false)
+							$textarea.prop("hidden", false)
+							$("#message_button").prop("hidden", false)
+							$("#reqbutton").prop("disabled", false)
+							$("#reqbutton").prop("hidden", false)
 							$("#chat-status").css('color', '#c0913b')
 							$("#chat-status").text("В работе у " + data.user)
 							$("#reqbutton").val("Завершить заявку")

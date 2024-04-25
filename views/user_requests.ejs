@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Панель администратора</title>
+    <title>Панель пользовател</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
@@ -18,29 +18,17 @@
 			<div class="profile">
                 <img src="<%= user.profile_picture %>" alt="profile_picture">
                 <h3><%= user.name %></h3>
-                <p>Администратор</p>
+                <p>Пользователь</p>
             </div>
 			<ul>
                 <li>
-                    <a href="/admin/">
-                        <span class="icon"><i class="fas fa-home"></i></span>
-                        <span class="item">Главная</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/admin/requests" class="active">
+                    <a href="/user" class="active">
                         <span class="icon"><i class="fas fa-desktop"></i></span>
                         <span class="item">Заявки</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <span class="icon"><i class="fas fa-chart-line"></i></span>
-                        <span class="item">Статистика</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/admin/settings">
+                    <a href="/user/settings">
                         <span class="icon"><i class="fas fa-cog"></i></span>
                         <span class="item">Настройки</span>
                     </a>
@@ -49,11 +37,14 @@
         </div>
     </div>
 	<div class="welcome-text" style="top:7%;">
-		<h1>Список заявок</h1>
+		<h1>Ваши заявки</h1>
 	</div>
+    <div class="create-new-request-button">
+        <button type="button" onclick="location.href='/user/new-request'">Создать новую заявку</button>
+    </div>
     <div class="requests-field">
         <% requests.forEach((req) => { %>
-                <div class="request" onclick="location.href='/admin/requests/<%= req.id %>'">
+                <div class="request" onclick="location.href='/user/requests/<%= req.id %>'">
                 <p class="request-number">Заявка №<%= req.id %></p>
                 <p class="request-status">Статус:</p>
                 <% if ( req.status == 0 ) { %>
@@ -67,7 +58,7 @@
                 <% } %>
                 <p class="request-text"><%= req.text %></p>
                 <p class="request-date"><%= req.date %></p>
-                <p class="request-user">Пользователь: <%= req.user %></p>
+                <!--<p class="request-user">Пользователь: <%= req.user %></p>-->
             </div>
         <% }) %>
     </div>

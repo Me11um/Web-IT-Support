@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Панель пользователя</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+  </head>
+  <body>
+	<!--<div id="particles-js"></div>
+	<script src="/js/particles.js"></script>
+	<script src="/js/app.js"></script>-->
+	 <div class="wrapper">
+        <div class="sidebar">
+			<div class="profile">
+                <img src="<%= user.profile_picture %>" alt="profile_picture">
+                <h3><%= user.name %></h3>
+                <p>Пользователь</p>
+            </div>
+			<ul>
+                <li>
+                    <a href="/user" class="active">
+                        <span class="icon"><i class="fas fa-desktop"></i></span>
+                        <span class="item">Заявки</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user/settings">
+                        <span class="icon"><i class="fas fa-cog"></i></span>
+                        <span class="item">Настройки</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+	<div class="welcome-text" style="top:7%;">
+		<h1>Создание новой заявки</h1>
+	</div>
+    <div class="description-text" style="top:20%;">
+		<h1>Пожалуйста, опишите подробнее проблему, с которой вы столкнулись. Специалисты примут вашу заявку и проведут работу над решением.</h1>
+	</div>
+    <div class="create-new-request">
+        <form action="/user/new-request" method="POST" id="reqform">
+            <textarea id="request_text" name="request_text" placeholder="Опишите проблему..." required></textarea>
+            <input id="request_button" type="submit" value="Создать заявку"> 
+        </form>
+    </div>
+  </body>
+</html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Панель администратора</title>
+    <title>Admin</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
@@ -18,15 +18,9 @@
 			<div class="profile">
                 <img src="<%= user.profile_picture %>" alt="profile_picture">
                 <h3><%= user.name %></h3>
-                <p>Администратор</p>
+                <p>Пользователь</p>
             </div>
 			<ul>
-                <li>
-                    <a href="/admin/" class="active">
-                        <span class="icon"><i class="fas fa-home"></i></span>
-                        <span class="item">Главная</span>
-                    </a>
-                </li>
                 <li>
                     <a href="/admin/requests">
                         <span class="icon"><i class="fas fa-desktop"></i></span>
@@ -35,12 +29,6 @@
                 </li>
                 <li>
                     <a href="#">
-                        <span class="icon"><i class="fas fa-chart-line"></i></span>
-                        <span class="item">Статистика</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/admin/settings">
                         <span class="icon"><i class="fas fa-cog"></i></span>
                         <span class="item">Настройки</span>
                     </a>
@@ -52,21 +40,21 @@
 		<h1>Добро пожаловать, <%= user.name %>!</h1>
 		<h2>Сегодня 18 марта 2024г.</h2>
 	</div>
-	<div class="main-elem" style="top: 55%; left: 40%;">
+	<div class="main-elem" style="top: 50%; left: 46%;">
 		<h2>Свободных заявок</h2>
-		<h1><%= new_req %></h1>
+		<h1>3</h1>
 	</div>
-	<div class="main-elem" style="top: 55%; left: 76%;">
+	<div class="main-elem" style="top: 50%; left: 70%;">
 		<h2>У вас в работе</h2>
-		<h1><%= inwork_req %></h1>
+		<h1>2</h1>
 	</div>
-	<!--<div class="main-elem" style="top: 80%; left: 46%;">
+	<div class="main-elem" style="top: 80%; left: 46%;">
 		<h2>Что-нибудь ещё</h2>
 		<h1>6</h1>
 	</div>
 	<div class="main-elem" style="top: 80%; left: 70%;">
 		<h2>Ваш рейтинг</h2>
 		<h1>156</h1>
-	</div>-->
+	</div>
   </body>
 </html>
