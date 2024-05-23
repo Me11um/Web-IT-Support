@@ -117,7 +117,7 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     database: "support",
-    password: ""
+    password: "123456"
 })
 
 db.connect( err => {
