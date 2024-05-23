@@ -2,6 +2,7 @@ const mysql = require('mysql2')
 const cookieParser = require('cookie-parser')
 const express = require('express')
 const axios = require('axios')
+var request = require('request');
 
 const app = express()
 
@@ -143,7 +144,7 @@ app.post('/login', (req, res) => {
     console.log(req.body)
 
     const { login, password } = req.body
-
+    /*
     db.query('SELECT * FROM users WHERE login = ? and password = ?', [login, password], (error, results) => {
         if (error) {
             console.log("Error connecting to database")
@@ -155,7 +156,18 @@ app.post('/login', (req, res) => {
             res.render('index', { error_message: "Пользователь не найден" })
         } 
     })
-
+    */
+    axios.get('http://localhost:8081?login='+login+"&password="+password).then((res1) => {
+        //console.log(res.data)
+        if (res1.data == "Error") {
+            res.render('index', { error_message: "Пользователь не найден" })
+        } else {
+            res.cookie('logged_user', res1.data.id)
+            if (res1.data.isadmin == 1) res.redirect("/admin"); else res.redirect("/user");
+        }
+    }).catch((err) => {
+        res.render('index', { error_message: "Не удалось связаться с сервером авторизации" })
+    });
 })
 
 app.post('/logout', (req, res) => {
