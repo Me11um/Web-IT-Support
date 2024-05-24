@@ -115,7 +115,8 @@ io.sockets.on('connection', function(socket) {
 })
 
 const db = mysql.createConnection({
-    host: "localhost",
+    //host: "localhost",
+    host: "Database",
     user: "root",
     database: "support",
     password: "123456"
