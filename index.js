@@ -261,7 +261,19 @@ app.post('/user/new-request', (req, res) => {
 
     // YYYY-MM-DD hh:mm:ss
     const formatted = `${day}-${month}-${year} ${hour}:${minute}:${second}`
+    
+    axios.post('http://localhost:8082?request_text='+request_text+'&formatted_date='+formatted+'&logged_user='+logged_user).then((res1) => {
+        //console.log(res.data)
+        if (res1.data == "Error") {
+            res.redirect("/user");
+        } else {
+            res.redirect("/user/requests/" + res1.data.id);
+        }
+    }).catch((err) => {
+        res.redirect("/user");
+    });
 
+    /*
     var res1
 
     db.query('INSERT INTO requests(status, text, date, user) VALUES (?,?,?,?)', [0, request_text, formatted, logged_user], (error, results) => {
@@ -283,7 +295,7 @@ app.post('/user/new-request', (req, res) => {
             res.redirect("/user/requests/" + res1[0].id);
         })
     })
-
+    */
 })
 
 app.get('/user/new-request', (req, res) => {
