@@ -157,7 +157,7 @@ app.post('/login', (req, res) => {
         } 
     })
     */
-    axios.get('http://localhost:8081?login='+login+"&password="+password).then((res1) => {
+    axios.get('http://api-1:8081?login='+login+"&password="+password).then((res1) => {
         //console.log(res.data)
         if (res1.data == "Error") {
             res.render('index', { error_message: "Пользователь не найден" })
@@ -262,7 +262,7 @@ app.post('/user/new-request', (req, res) => {
     // YYYY-MM-DD hh:mm:ss
     const formatted = `${day}-${month}-${year} ${hour}:${minute}:${second}`
     
-    axios.post('http://localhost:8082?request_text='+request_text+'&formatted_date='+formatted+'&logged_user='+logged_user).then((res1) => {
+    axios.post('http://api-2:8082?request_text='+request_text+'&formatted_date='+formatted+'&logged_user='+logged_user).then((res1) => {
         //console.log(res.data)
         if (res1.data == "Error") {
             res.redirect("/user");
@@ -598,13 +598,21 @@ app.get('/admin/requests', (req, res) => {
         }
         res2 = results
     })
+
+    axios.get('http://api-3:8083').then((res3) => {
+        //console.log(res.data)
+        res.render('admin_requests', { requests: res3.data, user: res1[0], users: res2, current_user: logged_user })
+    }).catch((err) => {
+        res.render('admin_requests', { requests: [], user: res1[0], users: res2, current_user: logged_user })
+    });
+    /*
     db.query('SELECT requests.id, status, text, date, users.name as user FROM requests INNER JOIN users ON requests.user = users.id ORDER BY requests.id DESC', (error, results) => {
         if (error) {
             console.log("Error connecting to database")
         }
         res.render('admin_requests', { requests: results, user: res1[0], users: res2, current_user: logged_user })
     })
-
+    */
 }) 
 
 app.get('/admin/requests/:id', (req, res) => {
