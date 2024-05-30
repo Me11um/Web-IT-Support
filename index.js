@@ -115,8 +115,8 @@ io.sockets.on('connection', function(socket) {
 })
 
 const db = mysql.createConnection({
-    //host: "localhost",
-    host: "Database",
+    host: "localhost",
+    //host: "Database",
     user: "root",
     database: "support",
     password: "123456"
@@ -145,7 +145,7 @@ app.post('/login', (req, res) => {
     console.log(req.body)
 
     const { login, password } = req.body
-    /*
+    
     db.query('SELECT * FROM users WHERE login = ? and password = ?', [login, password], (error, results) => {
         if (error) {
             console.log("Error connecting to database")
@@ -157,7 +157,8 @@ app.post('/login', (req, res) => {
             res.render('index', { error_message: "Пользователь не найден" })
         } 
     })
-    */
+
+   /*
     axios.get('http://api-1:8081?login='+login+"&password="+password).then((res1) => {
         //console.log(res.data)
         if (res1.data == "Error") {
@@ -169,6 +170,7 @@ app.post('/login', (req, res) => {
     }).catch((err) => {
         res.render('index', { error_message: "Не удалось связаться с сервером авторизации" })
     });
+    */
 })
 
 app.post('/logout', (req, res) => {
@@ -262,7 +264,7 @@ app.post('/user/new-request', (req, res) => {
 
     // YYYY-MM-DD hh:mm:ss
     const formatted = `${day}-${month}-${year} ${hour}:${minute}:${second}`
-    
+    /*
     axios.post('http://api-2:8082?request_text='+request_text+'&formatted_date='+formatted+'&logged_user='+logged_user).then((res1) => {
         //console.log(res.data)
         if (res1.data == "Error") {
@@ -273,8 +275,8 @@ app.post('/user/new-request', (req, res) => {
     }).catch((err) => {
         res.redirect("/user");
     });
-
-    /*
+    */
+    
     var res1
 
     db.query('INSERT INTO requests(status, text, date, user) VALUES (?,?,?,?)', [0, request_text, formatted, logged_user], (error, results) => {
@@ -296,7 +298,7 @@ app.post('/user/new-request', (req, res) => {
             res.redirect("/user/requests/" + res1[0].id);
         })
     })
-    */
+    
 })
 
 app.get('/user/new-request', (req, res) => {
@@ -599,21 +601,22 @@ app.get('/admin/requests', (req, res) => {
         }
         res2 = results
     })
-
+    /*
     axios.get('http://api-3:8083').then((res3) => {
         //console.log(res.data)
         res.render('admin_requests', { requests: res3.data, user: res1[0], users: res2, current_user: logged_user })
     }).catch((err) => {
         res.render('admin_requests', { requests: [], user: res1[0], users: res2, current_user: logged_user })
     });
-    /*
+    */
+    
     db.query('SELECT requests.id, status, text, date, users.name as user FROM requests INNER JOIN users ON requests.user = users.id ORDER BY requests.id DESC', (error, results) => {
         if (error) {
             console.log("Error connecting to database")
         }
         res.render('admin_requests', { requests: results, user: res1[0], users: res2, current_user: logged_user })
     })
-    */
+    
 }) 
 
 app.get('/admin/requests/:id', (req, res) => {
